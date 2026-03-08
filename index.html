@@ -12,21 +12,104 @@ body{font-family:'Nunito',sans-serif;background:var(--darker);color:#fff;overflo
 #gameCanvas{position:fixed;top:0;left:0;width:100%;height:100%;display:none}
 .screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:100}
 .screen.active{display:flex}
-#menuScreen{background:linear-gradient(135deg,#0F0F1A 0%,#1A1A2E 50%,#16213E 100%);overflow:hidden}
-.menu-bg{position:absolute;inset:0;overflow:hidden}
-.road-line{position:absolute;width:8px;background:linear-gradient(180deg,transparent,#FFD166,transparent);animation:roadMove 2s linear infinite;opacity:.3}
-@keyframes roadMove{0%{transform:translateY(-100vh)}100%{transform:translateY(100vh)}}
-.menu-content{position:relative;z-index:2;text-align:center;padding:20px}
-.game-logo{font-family:'Fredoka One',cursive;font-size:clamp(2.5rem,8vw,5rem);background:linear-gradient(135deg,#FF6B35,#FFD166,#06D6A0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 30px rgba(255,107,53,.5));margin-bottom:5px;animation:logoFloat 3s ease-in-out infinite}
-.game-subtitle{font-size:clamp(.9rem,2.5vw,1.2rem);color:rgba(255,255,255,.5);letter-spacing:.3em;text-transform:uppercase;margin-bottom:40px}
-@keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-.coins-display{display:flex;align-items:center;gap:8px;background:rgba(255,209,102,.15);border:1px solid rgba(255,209,102,.3);border-radius:30px;padding:8px 20px;font-size:1.1rem;font-weight:800;color:#FFD166;margin-bottom:30px;backdrop-filter:blur(10px)}
-.menu-btns{display:grid;grid-template-columns:1fr 1fr;gap:15px;max-width:400px;width:100%}
-.menu-btn{background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:18px 10px;font-family:'Fredoka One',cursive;font-size:1.1rem;color:#fff;cursor:pointer;transition:all .3s;backdrop-filter:blur(10px);display:flex;flex-direction:column;align-items:center;gap:8px}
-.menu-btn.play-btn{grid-column:1/-1;background:linear-gradient(135deg,#FF6B35,#FF8C42);border:none;font-size:1.4rem;padding:22px;box-shadow:var(--glow)}
-.menu-btn.play-btn:hover{transform:scale(1.03);box-shadow:0 0 35px rgba(255,107,53,.6)}
-.menu-btn:not(.play-btn):hover{background:rgba(255,255,255,.12);transform:translateY(-2px)}
-.btn-icon{font-size:2rem}
+/* ══ MENU — Road Scene ══════════════════════════════════════ */
+#menuScreen{overflow:hidden;background:#1a1a1a}
+
+/* Sky */
+.menu-sky{position:absolute;inset:0;background:linear-gradient(180deg,#1a3a6e 0%,#2563a8 45%,#f4a94a 72%,#e8633a 85%,#2a1a0e 100%);z-index:0}
+
+/* Sun / glow on horizon */
+.menu-sky::after{content:'';position:absolute;bottom:28%;left:50%;transform:translateX(-50%);width:clamp(80px,20vw,160px);height:clamp(40px,10vw,80px);background:radial-gradient(ellipse,rgba(255,220,100,.7) 0%,transparent 70%);border-radius:50%;filter:blur(18px)}
+
+/* Clouds */
+.cloud{position:absolute;background:rgba(255,255,255,.18);border-radius:50px;animation:cloudDrift linear infinite}
+@keyframes cloudDrift{from{transform:translateX(-200px)}to{transform:translateX(110vw)}}
+
+/* Ground / road */
+.menu-ground{position:absolute;bottom:0;left:0;right:0;height:38%;background:linear-gradient(180deg,#3a3a3a 0%,#2a2a2a 100%);z-index:1}
+
+/* Grass strips */
+.menu-ground::before{content:'';position:absolute;top:0;left:0;right:0;height:18px;background:linear-gradient(180deg,#2d5a1b,#4a8c2a);margin-top:-12px}
+.menu-ground::after{content:'';position:absolute;bottom:0;left:0;right:0;height:22px;background:#2d5a1b}
+
+/* Road lane markings */
+.lane-mark{position:absolute;top:30%;width:60px;height:8px;background:#FFD166;border-radius:4px;animation:laneDash 1.2s linear infinite}
+@keyframes laneDash{from{transform:translateX(110vw)}to{transform:translateX(-80px)}}
+
+/* Sidewalk */
+.menu-sidewalk{position:absolute;bottom:22px;left:0;right:0;height:24px;background:#888;z-index:2}
+.menu-sidewalk::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:#aaa}
+
+/* Buildings silhouette */
+.bld{position:absolute;bottom:100%;background:linear-gradient(180deg,#1a2a4a,#0f1a2e);z-index:1}
+
+/* Moving cars on road */
+.menu-car{position:absolute;z-index:3;animation:carDrive linear infinite}
+@keyframes carDrive{from{transform:translateX(-120px)}to{transform:translateX(110vw)}}
+.menu-car-left{animation-name:carDriveLeft}
+@keyframes carDriveLeft{from{transform:translateX(110vw) scaleX(-1)}to{transform:translateX(-120px) scaleX(-1)}}
+
+/* Traffic light post */
+.tl-post{position:absolute;z-index:4;display:flex;flex-direction:column;align-items:center}
+.tl-pole{width:6px;background:linear-gradient(180deg,#555,#333);border-radius:3px}
+.tl-box{background:#111;border-radius:5px;padding:4px 3px;display:flex;flex-direction:column;gap:3px;border:1px solid #333}
+.tl-light{border-radius:50%}
+
+/* Road sign post */
+.sign-post{position:absolute;z-index:4;display:flex;flex-direction:column;align-items:center}
+.sign-pole{width:5px;background:#666;border-radius:2px}
+.sign-face{border-radius:4px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.7rem;letter-spacing:.05em}
+
+/* Pedestrian crossing stripes on ground */
+.xwalk{position:absolute;z-index:2;display:flex;gap:5px}
+.xwalk-stripe{background:rgba(255,255,255,.7);border-radius:2px}
+
+/* ── MENU CONTENT (UI panel) ─────────────────────────── */
+.menu-content{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+
+/* Logo board — like a big road information sign */
+.logo-board{background:linear-gradient(160deg,#1a3560,#0d2040);border:4px solid #FFD166;border-radius:16px;padding:clamp(14px,3vw,24px) clamp(20px,5vw,48px);margin-bottom:clamp(14px,3vh,24px);box-shadow:0 0 0 2px #1a3560,0 8px 40px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.1);position:relative;pointer-events:all}
+.logo-board::before{content:'';position:absolute;inset:4px;border:1px solid rgba(255,209,102,.25);border-radius:12px;pointer-events:none}
+/* Corner bolts */
+.logo-board::after{content:'';position:absolute;width:10px;height:10px;background:#888;border-radius:50%;top:8px;right:8px;box-shadow:-1px 1px 0 #555;pointer-events:none}
+
+.bolt{position:absolute;width:10px;height:10px;background:radial-gradient(circle at 35% 35%,#aaa,#555);border-radius:50%}
+.bolt.tl{top:8px;left:8px}
+.bolt.br{bottom:8px;right:8px}
+.bolt.bl{bottom:8px;left:8px}
+
+.game-logo{font-family:'Fredoka One',cursive;font-size:clamp(2rem,7vw,4rem);color:#fff;line-height:1;letter-spacing:-.01em;text-shadow:0 2px 0 rgba(0,0,0,.4)}
+.game-logo span{color:#FFD166}
+.game-subtitle{font-size:clamp(.7rem,2vw,1rem);color:rgba(255,209,102,.7);letter-spacing:.25em;text-transform:uppercase;margin-top:4px;font-weight:700}
+
+/* Coin badge */
+.coins-display{display:inline-flex;align-items:center;gap:8px;background:#1a1a1a;border:2px solid #FFD166;border-radius:30px;padding:7px 18px;font-size:clamp(.9rem,2vw,1.1rem);font-weight:800;color:#FFD166;margin-bottom:clamp(12px,2.5vh,20px);pointer-events:all;box-shadow:0 0 16px rgba(255,209,102,.25)}
+
+/* Menu buttons — styled like road signs */
+.menu-btns{display:grid;grid-template-columns:1fr 1fr;gap:clamp(8px,2vw,14px);max-width:clamp(280px,80vw,440px);width:100%;pointer-events:all}
+
+.menu-btn{border:none;border-radius:12px;padding:clamp(14px,2.5vh,20px) 10px;font-family:'Fredoka One',cursive;font-size:clamp(.95rem,2.5vw,1.15rem);cursor:pointer;transition:transform .18s,box-shadow .18s;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;overflow:hidden}
+.menu-btn:active{transform:scale(.96)!important}
+
+/* PLAY — green go-signal style */
+.menu-btn.play-btn{grid-column:1/-1;background:linear-gradient(160deg,#1a8a2e,#0f6620);color:#fff;border:3px solid #22aa3a;font-size:clamp(1.1rem,3vw,1.5rem);padding:clamp(16px,3vh,24px);box-shadow:0 0 0 1px #0a4010,0 6px 24px rgba(0,150,50,.5),inset 0 1px 0 rgba(255,255,255,.15)}
+.menu-btn.play-btn::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.12),transparent 65%)}
+.menu-btn.play-btn:hover{transform:translateY(-3px);box-shadow:0 0 0 1px #0a4010,0 10px 32px rgba(0,200,70,.5),inset 0 1px 0 rgba(255,255,255,.15)}
+
+/* CARS — blue info sign style */
+.menu-btn.cars-btn{background:linear-gradient(160deg,#0d4a8a,#092f5e);color:#fff;border:2px solid #1a7acc;box-shadow:0 4px 16px rgba(10,80,180,.4),inset 0 1px 0 rgba(255,255,255,.1)}
+.menu-btn.cars-btn:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(10,80,180,.5)}
+
+/* CHARACTERS — yellow warning style */
+.menu-btn.chars-btn{background:linear-gradient(160deg,#b87a00,#8a5a00);color:#fff;border:2px solid #FFD166;box-shadow:0 4px 16px rgba(180,120,0,.4),inset 0 1px 0 rgba(255,255,255,.1)}
+.menu-btn.chars-btn:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(200,140,0,.5)}
+
+/* CONTROLS — red stop-sign style */
+.menu-btn.ctrl-btn{background:linear-gradient(160deg,#8a0f0f,#5e0707);color:#fff;border:2px solid #e03030;box-shadow:0 4px 16px rgba(180,20,20,.4),inset 0 1px 0 rgba(255,255,255,.1)}
+.menu-btn.ctrl-btn:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(220,20,20,.5)}
+
+.btn-icon{font-size:clamp(1.6rem,4vw,2.2rem)}
+.btn-tag{font-size:.65rem;letter-spacing:.15em;opacity:.7;text-transform:uppercase;font-family:'Nunito',sans-serif;font-weight:800}
 #levelScreen,#carsScreen,#charsScreen,#controlsScreen{background:linear-gradient(135deg,#0F0F1A,#1A1A2E)}
 .level-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;max-width:900px;width:95%;margin-top:20px}
 .level-card{background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:25px;cursor:pointer;transition:all .3s;backdrop-filter:blur(10px);position:relative;overflow:hidden}
@@ -128,23 +211,117 @@ body{font-family:'Nunito',sans-serif;background:var(--darker);color:#fff;overflo
 </head>
 <body>
 
-<div id="loadingScreen" class="screen active">
-  <div style="font-size:3rem">🚦</div>
-  <div class="loading-text">Loading Road to Safety...</div>
-  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+<div id="loadingScreen" class="screen active" style="background:linear-gradient(180deg,#1a3a6e,#2a1a0e);flex-direction:column;gap:0">
+  <div style="font-size:3.5rem;margin-bottom:8px;animation:pulse 1s ease-in-out infinite">🚦</div>
+  <div style="font-family:'Fredoka One',cursive;font-size:1.6rem;color:#FFD166;margin-bottom:4px">Road to Safety</div>
+  <div class="loading-text" style="color:rgba(255,255,255,.5);font-size:.9rem">Loading your journey...</div>
+  <div class="loading-bar-wrap" style="margin-top:18px"><div class="loading-bar"></div></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:30%;background:linear-gradient(180deg,#3a3a3a,#2a2a2a);display:flex;align-items:flex-start;padding-top:8px;justify-content:center;gap:40px;font-size:2rem">
+    🚗 🚕 🚙 🚌
+  </div>
 </div>
 
 <div id="menuScreen" class="screen">
-  <div class="menu-bg" id="menuBg"></div>
+  <!-- Sky layer -->
+  <div class="menu-sky"></div>
+
+  <!-- Clouds -->
+  <div class="cloud" style="top:8%;left:-10%;width:140px;height:32px;animation-duration:28s;animation-delay:0s"></div>
+  <div class="cloud" style="top:14%;left:-10%;width:90px;height:22px;animation-duration:22s;animation-delay:7s;opacity:.12"></div>
+  <div class="cloud" style="top:6%;left:-10%;width:200px;height:40px;animation-duration:38s;animation-delay:14s;opacity:.15"></div>
+
+  <!-- Building silhouettes -->
+  <div class="bld" style="left:2%;width:clamp(40px,7vw,80px);height:clamp(90px,18vh,160px);bottom:38%;border-radius:4px 4px 0 0"></div>
+  <div class="bld" style="left:7%;width:clamp(30px,5vw,56px);height:clamp(60px,12vh,110px);bottom:38%;border-radius:3px 3px 0 0;background:linear-gradient(180deg,#0d2040,#0a1628)"></div>
+  <div class="bld" style="left:12%;width:clamp(50px,8vw,90px);height:clamp(110px,22vh,200px);bottom:38%;border-radius:4px 4px 0 0"></div>
+  <div class="bld" style="right:2%;width:clamp(45px,8vw,85px);height:clamp(100px,20vh,180px);bottom:38%;border-radius:4px 4px 0 0"></div>
+  <div class="bld" style="right:8%;width:clamp(35px,6vw,65px);height:clamp(70px,14vh,130px);bottom:38%;border-radius:3px 3px 0 0;background:linear-gradient(180deg,#0e2236,#091620)"></div>
+  <div class="bld" style="right:14%;width:clamp(55px,9vw,95px);height:clamp(120px,24vh,220px);bottom:38%;border-radius:4px 4px 0 0"></div>
+
+  <!-- Road ground -->
+  <div class="menu-ground"></div>
+
+  <!-- Pedestrian crossing -->
+  <div class="xwalk" style="position:absolute;bottom:22%;left:50%;transform:translateX(-50%);flex-direction:column;gap:4px;z-index:2">
+    <div class="xwalk-stripe" style="width:clamp(60px,14vw,120px);height:clamp(6px,1.2vh,10px)"></div>
+    <div class="xwalk-stripe" style="width:clamp(60px,14vw,120px);height:clamp(6px,1.2vh,10px)"></div>
+    <div class="xwalk-stripe" style="width:clamp(60px,14vw,120px);height:clamp(6px,1.2vh,10px)"></div>
+  </div>
+
+  <!-- Lane markings -->
+  <div class="lane-mark" style="top:67%;animation-duration:2.8s;animation-delay:0s"></div>
+  <div class="lane-mark" style="top:67%;animation-duration:2.8s;animation-delay:.93s"></div>
+  <div class="lane-mark" style="top:67%;animation-duration:2.8s;animation-delay:1.86s"></div>
+
+  <!-- Moving cars -->
+  <div class="menu-car" style="bottom:27%;animation-duration:4.5s;animation-delay:0s;font-size:clamp(1.4rem,4vw,2.2rem)">🚗</div>
+  <div class="menu-car" style="bottom:27%;animation-duration:3.8s;animation-delay:1.8s;font-size:clamp(1.2rem,3vw,1.8rem)">🚕</div>
+  <div class="menu-car menu-car-left" style="bottom:32%;animation-duration:5s;animation-delay:.5s;font-size:clamp(1.4rem,4vw,2.2rem)">🚙</div>
+  <div class="menu-car menu-car-left" style="bottom:32%;animation-duration:4.2s;animation-delay:2.5s;font-size:clamp(1rem,3vw,1.6rem)">🚌</div>
+
+  <!-- Traffic light left -->
+  <div class="tl-post" style="left:clamp(12px,4vw,50px);bottom:33%">
+    <div class="tl-box">
+      <div class="tl-light" style="width:clamp(10px,2vw,16px);height:clamp(10px,2vw,16px);background:#ff3333;box-shadow:0 0 6px #ff3333"></div>
+      <div class="tl-light" style="width:clamp(10px,2vw,16px);height:clamp(10px,2vw,16px);background:#1a1a1a"></div>
+      <div class="tl-light" style="width:clamp(10px,2vw,16px);height:clamp(10px,2vw,16px);background:#1a1a1a"></div>
+    </div>
+    <div class="tl-pole" style="height:clamp(40px,8vh,80px)"></div>
+  </div>
+
+  <!-- Traffic light right -->
+  <div class="tl-post" style="right:clamp(12px,4vw,50px);bottom:33%">
+    <div class="tl-box">
+      <div class="tl-light" style="width:clamp(10px,2vw,16px);height:clamp(10px,2vw,16px);background:#1a1a1a"></div>
+      <div class="tl-light" style="width:clamp(10px,2vw,16px);height:clamp(10px,2vw,16px);background:#1a1a1a"></div>
+      <div class="tl-light" style="width:clamp(10px,2vw,16px);height:clamp(10px,2vw,16px);background:#22cc44;box-shadow:0 0 6px #22cc44"></div>
+    </div>
+    <div class="tl-pole" style="height:clamp(40px,8vh,80px)"></div>
+  </div>
+
+  <!-- Road signs -->
+  <div class="sign-post" style="left:clamp(45px,10vw,110px);bottom:36%">
+    <div class="sign-face" style="background:#cc0000;color:#fff;width:clamp(28px,5vw,44px);height:clamp(28px,5vw,44px);border-radius:4px;border:2px solid #fff;font-size:clamp(.5rem,1.2vw,.75rem)">STOP</div>
+    <div class="sign-pole" style="height:clamp(28px,6vh,55px)"></div>
+  </div>
+  <div class="sign-post" style="right:clamp(45px,10vw,110px);bottom:36%">
+    <div class="sign-face" style="background:#FFD166;color:#1a1a1a;width:clamp(28px,5vw,44px);height:clamp(28px,5vw,44px);transform:rotate(45deg);border:2px solid #1a1a1a;font-size:clamp(.4rem,1vw,.65rem)">⚠</div>
+    <div class="sign-pole" style="height:clamp(28px,6vh,55px)"></div>
+  </div>
+
+  <!-- Sidewalk -->
+  <div class="menu-sidewalk"></div>
+
+  <!-- UI Content -->
   <div class="menu-content">
-    <div class="game-logo">🚦 Road to Safety</div>
-    <div class="game-subtitle">Master the Road. Be Aware</div>
+    <!-- Logo board like a road info sign -->
+    <div class="logo-board">
+      <div class="bolt tl"></div>
+      <div class="bolt br"></div>
+      <div class="bolt bl"></div>
+      <div class="game-logo">🚦 Road to <span>Safety</span></div>
+      <div class="game-subtitle">Master The Road. Be Aware</div>
+    </div>
+
     <div class="coins-display">🪙 <span id="menuCoins">0</span> Coins</div>
+
     <div class="menu-btns">
-      <button class="menu-btn play-btn" onclick="showScreen('levelScreen')"><span class="btn-icon">▶️</span> Play</button>
-      <button class="menu-btn" onclick="showScreen('carsScreen')"><span class="btn-icon">🚗</span> Cars</button>
-      <button class="menu-btn" onclick="showScreen('charsScreen')"><span class="btn-icon">👤</span> Characters</button>
-      <button class="menu-btn" onclick="showScreen('controlsScreen')"><span class="btn-icon">🎮</span> Controls</button>
+      <button class="menu-btn play-btn" onclick="showScreen('levelScreen')">
+        <span class="btn-icon">🟢</span> PLAY
+        <span class="btn-tag">Start Adventure</span>
+      </button>
+      <button class="menu-btn cars-btn" onclick="showScreen('carsScreen')">
+        <span class="btn-icon">🚗</span> CARS
+        <span class="btn-tag">Garage</span>
+      </button>
+      <button class="menu-btn chars-btn" onclick="showScreen('charsScreen')">
+        <span class="btn-icon">🧑</span> CHARACTERS
+        <span class="btn-tag">Choose Player</span>
+      </button>
+      <button class="menu-btn ctrl-btn" onclick="showScreen('controlsScreen')">
+        <span class="btn-icon">🎮</span> CONTROLS
+        <span class="btn-tag">How to Play</span>
+      </button>
     </div>
   </div>
 </div>
@@ -392,7 +569,7 @@ function updateHUD() {
 function renderControls() {
   $('controlsCard').innerHTML = IS_MOBILE ? `
     <h3 style="font-family:'Fredoka One',cursive;margin-bottom:15px;font-size:1.2rem">📱 Mobile / Tablet Controls</h3>
-    ${[['🕹️ Joystick','Move around'],['👆 Swipe','Look around'],['🏠 Button','Go to menu']].map(
+    ${[['🕹️ Left Joystick','Move around'],['✌️ 2-Finger Swipe','Look / rotate camera'],['🏠 Button','Go to menu']].map(
       ([k,v])=>`<div class="control-row"><span class="key-badge">${k}</span><span class="control-desc">${v}</span></div>`
     ).join('')}` : `
     <h3 style="font-family:'Fredoka One',cursive;margin-bottom:15px;font-size:1.2rem">🖥️ PC / Laptop Controls</h3>
@@ -1074,17 +1251,28 @@ function setupInputHandlers() {
     });
   } else {
     setupJoystick();
-    let lastTouch = null;
-    cv.addEventListener('touchstart', e => { if(e.touches.length===1) lastTouch = {x:e.touches[0].clientX, y:e.touches[0].clientY}; }, {passive:true});
-    cv.addEventListener('touchmove', e => {
-      if (!lastTouch || e.touches.length !== 1) return;
-      const dx = e.touches[0].clientX - lastTouch.x;
-      const dy = e.touches[0].clientY - lastTouch.y;
-      gYaw += dx * 0.004;
-      gPitch = Math.max(-0.5, Math.min(0.5, gPitch + dy * 0.003));
-      lastTouch = {x:e.touches[0].clientX, y:e.touches[0].clientY};
+    // 2-finger swipe = camera look
+    let lastTwoTouch = null;
+    cv.addEventListener('touchstart', e => {
+      if (e.touches.length === 2) {
+        const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        const my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+        lastTwoTouch = {x: mx, y: my};
+      }
     }, {passive:true});
-    cv.addEventListener('touchend', () => { lastTouch = null; }, {passive:true});
+    cv.addEventListener('touchmove', e => {
+      if (e.touches.length !== 2 || !lastTwoTouch) return;
+      const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      const my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      const dx = mx - lastTwoTouch.x;
+      const dy = my - lastTwoTouch.y;
+      gYaw += dx * 0.005;
+      gPitch = Math.max(-0.5, Math.min(0.5, gPitch + dy * 0.004));
+      lastTwoTouch = {x: mx, y: my};
+    }, {passive:true});
+    cv.addEventListener('touchend', e => {
+      if (e.touches.length < 2) lastTwoTouch = null;
+    }, {passive:true});
   }
 }
 
@@ -1443,21 +1631,31 @@ function showFeedback(ok) {
     const answeredIdx = gQuizAnsweredCount - 1;
     const bar = gBarriers.find(b => b.userData.crossingIdx === answeredIdx);
     if (bar) { bar.userData.active = false; gScene.remove(bar); }
-  } else {
+  }
+  // Wrong answer: lose a heart but still continue to next question
+  if (!ok) {
     loseHeart();
   }
   const fb = $('quizFeedback');
   $('fbIcon').textContent = ok ? '🎉' : '😞';
   $('fbText').textContent = ok ? 'Correct!' : 'Wrong Answer!';
   $('fbSub').textContent = ok ? 'Great road safety knowledge!' : 'Remember the road safety rules!';
-  $('fbCoins').textContent = ok ? `+🪙${reward} Coins` : '';
+  $('fbCoins').textContent = ok ? `+🪙${reward} Coins` : '−❤️ Keep going!';
   fb.style.display = 'block';
   requestAnimationFrame(() => fb.classList.add('show'));
 
+  // Always resume after feedback, even on wrong answer (unless game over from loseHeart)
+  const delay = 1800;
   setTimeout(() => {
     fb.classList.remove('show');
-    setTimeout(() => { fb.style.display='none'; gQuizActive = false; checkTriggers(); }, 300);
-  }, 1800);
+    setTimeout(() => {
+      fb.style.display = 'none';
+      if (!gLevelDone) {
+        gQuizActive = false;
+        checkTriggers();
+      }
+    }, 300);
+  }, delay);
 }
 
 function finishLevel() {
@@ -1503,19 +1701,10 @@ window.addEventListener('resize', () => {
 });
 
 // ─── MENU BG ANIMATION ───────────────────────────────────────────────────────
-function buildMenuBg() {
-  const bg = $('menuBg');
-  for (let i = 0; i < 8; i++) {
-    const l = document.createElement('div');
-    l.className = 'road-line';
-    l.style.cssText = `left:${10+i*11}%;height:${60+Math.random()*100}px;animation-delay:${Math.random()*2}s;animation-duration:${1.5+Math.random()}s`;
-    bg.appendChild(l);
-  }
-}
+// Road scene is pure CSS/HTML — no JS needed for menu background
 
 // ─── BOOT ────────────────────────────────────────────────────────────────────
 window.addEventListener('load', () => {
-  buildMenuBg();
   setTimeout(() => {
     $('loadingScreen').classList.remove('active');
     showScreen('menuScreen');
